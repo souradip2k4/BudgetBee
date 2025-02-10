@@ -1,0 +1,79 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["typedSql"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id         String     @id @default(cuid())
+    email      String
+    first_name String?
+    last_name  String?
+    username   String     @unique
+    created_at DateTime   @default(now())
+    updated_at DateTime   @updatedAt
+    entries    Entry[]
+    tags       Tag[]
+    apiKeys    ApiKey[]
+    categories Category[]
+}
+
+model Entry {
+    id          String    @id @default(cuid())
+    amount      Decimal
+    date        DateTime  @db.Date
+    created_at  DateTime  @default(now())
+    updated_at  DateTime  @updatedAt
+    message     String?
+    user_id     String
+    user        User      @relation(fields: [user_id], references: [id])
+    tags        Tag[]
+    category_id String?
+    category    Category? @relation(fields: [category_id], references: [id])
+}
+
+model Category {
+    id         String   @id @default(cuid())
+    name       String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    entries    Entry[]
+    user_id    String
+    user       User     @relation(fields: [user_id], references: [id])
+
+    @@unique([name, user_id])
+}
+
+model Tag {
+    id         String   @id @default(cuid())
+    name       String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    user_id    String
+    user       User     @relation(fields: [user_id], references: [id])
+    entries    Entry[]
+}
+
+enum ApiAccessPermission {
+    ADMIN
+    ALL
+    READONLY // default
+    WRITE // write include CREATE, EDIT, DELETE
+    CREATE
+    EDIT
+    DELETE
+}
+
+model ApiKey {
+    id           String                @id @default(cuid())
+    key          String                @unique @default(uuid())
+    user_id      String
+    created_at   DateTime              @default(now())
+    expire_at    DateTime
+    user         User                  @relation(fields: [user_id], references: [id])
+    perimissions ApiAccessPermission[] @default([READONLY])
+}
