@@ -1,0 +1,14 @@
+- [...] Hono.js api routes
+- [ ] Settings page (??)
+- [ ] Accounts page - just put clerk accounts page
+- [ ] Categories and tags
+- [ ] api keys page
+
+Setting page options
+- currencies
+- 
+
+
+Fixes
+- [ ] Remove implementation specific stuff
+    - [~] Decimal from prisma
